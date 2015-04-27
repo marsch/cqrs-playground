@@ -11,15 +11,23 @@ class EventSourced
   @newInstance: () ->
     instance = new @
     instance.id = IdentityGenerator.new()
+
+    creationCommand = new Command {
+      command: "create:#{instance.entityName}"
+      data:
+        id: instance.id
+    }
+    PubSub.publish 'command', creationCommand
     instance
 
   constructor: (attr = {}) ->
     # init instance variable
     @attributes = helpers.merge(@attributes, attr)
 
+
   startWatch: () ->
     Object.observe @attributes, @onChanges
-    PubSub.subscribe 'event:' + @id, @onEvent
+    PubSub.subscribe "event.#{@id}", @onEvent
     console.log 'start listing to events', 'event:' + @id
 
   stopWatch: () ->
@@ -45,7 +53,7 @@ class EventSourced
   onChanges: (changes) =>
     cmds = []
     for change in changes
-      command = Command.newInstance change, @id, @entityName
+      command = Command.newFromChangeEvent change, @id, @entityName
       cmds.push command if command
 
     bulkCommand = new Command {

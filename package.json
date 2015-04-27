@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "coffee-script": "^1.9.2",
+    "pouchdb": "^3.4.0",
     "pubsub-js": "^1.5.2"
   }
 }

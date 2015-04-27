@@ -1,6 +1,9 @@
 PubSub = require '../../node_modules/pubsub-js/src/pubsub'
 Event = require './event'
 
+
+
+# it just simulates the backend behavoir
 class CommandHandler
   operationMap:
     'create': 'created'
@@ -28,12 +31,19 @@ class CommandHandler
     property = command.getProperty()
     eventName = @operationMap[command.getOperation()]
 
+    eventName ="#{entity}:#{eventName}"
+    eventTopic = 'event'
+
+    if property
+      eventName ="#{entity}:#{property}:#{eventName}"
+      eventTopic = "event.#{command.attributes.data.id}"
+
     event = Event.newInstance({
-      event: "#{entity}:#{property}:#{eventName}"
+      event: eventName
       data: command.attributes.data
       commandId: command.id
     })
-    eventTopic = "event:#{command.attributes.data.id}"
+
     PubSub.publish(eventTopic, event)
     console.log('new event', event)
     console.log 'publishiung', eventTopic

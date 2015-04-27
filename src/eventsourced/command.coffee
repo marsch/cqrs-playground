@@ -8,7 +8,7 @@ class Command
     'update': 'update'
     'delete': 'delete'
 
-  @newInstance: (changeEvent, id, entityName) ->
+  @newFromChangeEvent: (changeEvent, id, entityName) ->
     # init instance variable
 
     newValue = changeEvent.object[changeEvent.name]
@@ -30,12 +30,11 @@ class Command
     attributes.data[changeEvent.name] = newValue
     attributes.command = "#{type}:#{entityName}:#{changeEvent.name}"
 
-    instance = new Command attributes
-    instance.id = IdentityGenerator.new()
-    instance
+    new Command attributes
 
   constructor: (@attributes) ->
     @attributes = @attributes
+    @id = IdentityGenerator.new()
 
   getEntity: () ->
     @attributes.command.split(':')[1]
